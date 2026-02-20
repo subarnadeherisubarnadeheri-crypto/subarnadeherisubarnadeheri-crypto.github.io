@@ -1,138 +1,163 @@
-<body>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Prediction Demo Game</title>
 
 <style>
 body{
   margin:0;
-  font-family:'Poppins',sans-serif;
+  font-family:Arial, sans-serif;
   background:#111;
+  color:white;
+  text-align:center;
+}
+
+.header{
+  padding:15px;
+  background:#000;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.timer{
+  font-size:28px;
+  margin:20px 0;
+}
+
+.result-box{
+  margin:20px auto;
+  padding:20px;
+  width:200px;
+  border-radius:10px;
+  font-size:24px;
+  font-weight:bold;
+}
+
+.red{
+  background:red;
+}
+
+.green{
+  background:green;
+}
+
+.number{
+  font-size:50px;
+  margin-top:10px;
+}
+
+.buttons{
+  margin-top:20px;
+}
+
+button{
+  padding:10px 20px;
+  margin:10px;
+  font-size:18px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.btn-red{
+  background:red;
   color:white;
 }
 
-/* Layout */
-.main{
-  display:flex;
+.btn-green{
+  background:green;
+  color:white;
 }
 
-/* Sidebar */
-.sidebar{
-  width:220px;
-  background:#000;
-  padding:15px;
-  height:100vh;
-}
-.sidebar a{
-  display:block;
-  color:#fff;
-  text-decoration:none;
-  padding:10px 0;
-  border-bottom:1px solid #222;
-  font-size:14px;
-}
-.sidebar a:hover{
-  color:#ff9800;
+.history{
+  margin-top:30px;
+  padding:10px;
 }
 
-/* Center Content */
-.content{
-  flex:1;
-  padding:20px;
-}
-
-/* Rashi Grid */
-.rashi-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
-  gap:20px;
-  text-align:center;
-  margin-top:20px;
-}
-.rashi-item{
-  background:#1a1a1a;
-  padding:15px;
-  border-radius:10px;
-  cursor:pointer;
-  transition:0.3s;
-}
-.rashi-item:hover{
-  background:#ff9800;
-  color:black;
-}
-
-/* Right Panel */
-.right-panel{
-  width:300px;
-  background:#1a1a1a;
-  padding:15px;
-}
-.card{
-  background:#222;
-  padding:15px;
-  border-radius:10px;
-}
-.card h3{
-  margin-top:0;
-  color:#ff9800;
-}
-
-/* Mobile */
-@media(max-width:900px){
-  .sidebar{display:none;}
-  .right-panel{display:none;}
+.history-item{
+  margin:5px 0;
 }
 </style>
+</head>
 
-<div class="main">
+<body>
 
-<!-- LEFT SIDEBAR -->
-<div class="sidebar">
-  <a href="#">🏠 होम</a>
-  <a href="#">📰 टॉप न्यूज़</a>
-  <a href="#">🏏 स्पोर्ट्स</a>
-  <a href="#">💼 बिजनेस</a>
-  <a href="#">🎬 एंटरटेनमेंट</a>
-  <a href="#">🔮 राशिफल</a>
-  <a href="#">📚 शिक्षा</a>
-  <a href="#">🌍 देश-विदेश</a>
+<div class="header">
+Color Prediction Demo Game
 </div>
 
-<!-- CENTER CONTENT -->
-<div class="content">
-
-<h2>राशिफल</h2>
-<p>चंद्र राशि के अनुसार अपनी राशि चुनिए</p>
-
-<div class="rashi-grid">
-
-<div class="rashi-item">♈<br>मेष</div>
-<div class="rashi-item">♉<br>वृष</div>
-<div class="rashi-item">♊<br>मिथुन</div>
-<div class="rashi-item">♋<br>कर्क</div>
-<div class="rashi-item">♌<br>सिंह</div>
-<div class="rashi-item">♍<br>कन्या</div>
-<div class="rashi-item">♎<br>तुला</div>
-<div class="rashi-item">♏<br>वृश्चिक</div>
-<div class="rashi-item">♐<br>धनु</div>
-<div class="rashi-item">♑<br>मकर</div>
-<div class="rashi-item">♒<br>कुंभ</div>
-<div class="rashi-item">♓<br>मीन</div>
-
+<div class="timer">
+Next Result In: <span id="countdown">60</span> sec
 </div>
 
+<div id="resultBox" class="result-box green">
+Color: GREEN
+<div class="number" id="numberResult">0</div>
 </div>
 
-<!-- RIGHT PANEL -->
-<div class="right-panel">
-
-<div class="card">
-<h3>आज का राशिफल - मेष</h3>
-<p>
-आज का दिन सकारात्मक रहेगा। काम में सफलता मिलेगी।
-धन लाभ के योग बन रहे हैं। परिवार का सहयोग मिलेगा।
-</p>
+<div class="buttons">
+<button class="btn-red">Select RED</button>
+<button class="btn-green">Select GREEN</button>
 </div>
 
+<div class="history">
+<h3>Result History</h3>
+<div id="historyList"></div>
 </div>
 
-</div>
+<script>
 
-                        </body>
+let timeLeft = 60;
+
+function startTimer(){
+  setInterval(function(){
+    timeLeft--;
+    document.getElementById("countdown").innerText = timeLeft;
+
+    if(timeLeft <= 0){
+      generateResult();
+      timeLeft = 60;
+    }
+  },1000);
+}
+
+function generateResult(){
+  
+  let randomNumber = Math.floor(Math.random() * 10); // 0-9 number
+  
+  let color = randomNumber % 2 === 0 ? "GREEN" : "RED";
+  
+  let resultBox = document.getElementById("resultBox");
+  let numberResult = document.getElementById("numberResult");
+  
+  numberResult.innerText = randomNumber;
+  
+  if(color === "GREEN"){
+    resultBox.className = "result-box green";
+  } else {
+    resultBox.className = "result-box red";
+  }
+  
+  resultBox.innerHTML = "Color: " + color + 
+  '<div class="number">'+ randomNumber +'</div>';
+  
+  addHistory(color, randomNumber);
+}
+
+function addHistory(color, number){
+  let historyList = document.getElementById("historyList");
+  
+  let newItem = document.createElement("div");
+  newItem.className = "history-item";
+  newItem.innerText = color + " - " + number;
+  
+  historyList.prepend(newItem);
+}
+
+startTimer();
+
+</script>
+
+</body>
+  </html>
