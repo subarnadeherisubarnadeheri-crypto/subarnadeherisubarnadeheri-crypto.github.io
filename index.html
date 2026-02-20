@@ -14,7 +14,6 @@ body{
     text-align:center;
 }
 
-/* Header */
 header{
     padding:15px;
     font-size:22px;
@@ -23,7 +22,6 @@ header{
     position:relative;
 }
 
-/* Wallet Button */
 .wallet-btn{
     position:absolute;
     right:15px;
@@ -35,14 +33,12 @@ header{
     font-size:14px;
 }
 
-/* Timer */
 .timer{
     font-size:30px;
     margin:20px;
     color:#00ffcc;
 }
 
-/* Numbers */
 .numbers{
     display:grid;
     grid-template-columns:repeat(5,60px);
@@ -67,7 +63,6 @@ header{
 .red{background:#d50000;}
 .violet{background:#aa00ff;}
 
-/* Popup */
 .popup{
     display:none;
     position:fixed;
@@ -108,7 +103,6 @@ header{
     font-size:16px;
 }
 
-/* History */
 .history{
     margin-top:20px;
 }
@@ -130,10 +124,9 @@ HD Color Prediction Game
 <ul id="historyList"></ul>
 </div>
 
-<!-- Popup -->
 <div class="popup" id="popup">
   <div class="popup-content">
-    <img src="https://via.placeholder.com/100" id="popupImg">
+    <img src="https://via.placeholder.com/100">
     <h3 id="popupTitle"></h3>
     <select id="amount">
       <option value="10">₹10</option>
@@ -148,21 +141,25 @@ HD Color Prediction Game
 <script>
 
 let walletAmount = 1000;
+let selectedColor="";
+let roundTime = 30;
 
-function showWallet(){
-    alert("Wallet Balance: ₹" + walletAmount);
+/* REAL TIME CONTINUOUS TIMER */
+function updateTimer(){
+    let now = Math.floor(Date.now()/1000);
+    let seconds = now % roundTime;
+    let remaining = roundTime - seconds;
+
+    document.getElementById("time").innerText = remaining;
+
+    if(remaining === roundTime){
+        generateResult();
+    }
 }
 
-let time=30;
-setInterval(()=>{
-    time--;
-    document.getElementById("time").innerText=time;
-    if(time<=0){
-        generateResult();
-        time=30;
-    }
-},1000);
+setInterval(updateTimer,1000);
 
+/* RESULT */
 function generateResult(){
     let num=Math.floor(Math.random()*10);
     let li=document.createElement("li");
@@ -170,8 +167,12 @@ function generateResult(){
     document.getElementById("historyList").prepend(li);
 }
 
-let selectedColor="";
+/* WALLET */
+function showWallet(){
+    alert("Wallet Balance: ₹" + walletAmount);
+}
 
+/* POPUP */
 function openPopup(color){
     selectedColor=color;
     document.getElementById("popup").style.display="flex";
@@ -180,15 +181,18 @@ function openPopup(color){
 
 function confirmBet(){
     let amount=parseInt(document.getElementById("amount").value);
+
     if(amount>walletAmount){
         alert("Insufficient Balance!");
         return;
     }
+
     walletAmount-=amount;
     alert("Bet Placed on "+selectedColor+" for ₹"+amount);
     document.getElementById("popup").style.display="none";
 }
 
+/* CREATE NUMBERS */
 let numbersDiv=document.getElementById("numbers");
 
 for(let i=0;i<=9;i++){
