@@ -14,6 +14,7 @@ body{
     text-align:center;
 }
 
+/* HEADER */
 header{
     padding:15px;
     font-size:22px;
@@ -33,12 +34,14 @@ header{
     font-size:14px;
 }
 
+/* TIMER */
 .timer{
     font-size:30px;
     margin:20px;
     color:#00ffcc;
 }
 
+/* NUMBERS */
 .numbers{
     display:grid;
     grid-template-columns:repeat(5,60px);
@@ -55,168 +58,3 @@ header{
     align-items:center;
     justify-content:center;
     font-size:20px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.green{background:#00c853;}
-.red{background:#d50000;}
-.violet{background:#aa00ff;}
-
-.popup{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.8);
-    justify-content:center;
-    align-items:center;
-}
-
-.popup-content{
-    background:#222;
-    padding:20px;
-    border-radius:10px;
-    width:300px;
-}
-
-.popup img{
-    width:100px;
-    margin-bottom:10px;
-}
-
-.popup select{
-    padding:8px;
-    width:100%;
-    margin:10px 0;
-}
-
-.popup button{
-    padding:10px;
-    width:100%;
-    background:#ff9800;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:16px;
-}
-
-.history{
-    margin-top:20px;
-}
-</style>
-</head>
-<body>
-
-<header>
-HD Color Prediction Game
-<div class="wallet-btn" onclick="showWallet()">Wallet</div>
-</header>
-
-<div class="timer">Time Left: <span id="time">30</span>s</div>
-
-<div class="numbers" id="numbers"></div>
-
-<div class="history">
-<h3>Game History</h3>
-<ul id="historyList"></ul>
-</div>
-
-<div class="popup" id="popup">
-  <div class="popup-content">
-    <img src="https://via.placeholder.com/100">
-    <h3 id="popupTitle"></h3>
-    <select id="amount">
-      <option value="10">₹10</option>
-      <option value="50">₹50</option>
-      <option value="100">₹100</option>
-      <option value="500">₹500</option>
-    </select>
-    <button onclick="confirmBet()">OK</button>
-  </div>
-</div>
-
-<script>
-
-let walletAmount = 1000;
-let selectedColor="";
-let roundTime = 30;
-
-/* REAL TIME CONTINUOUS TIMER */
-function updateTimer(){
-    let now = Math.floor(Date.now()/1000);
-    let seconds = now % roundTime;
-    let remaining = roundTime - seconds;
-
-    document.getElementById("time").innerText = remaining;
-
-    if(remaining === roundTime){
-        generateResult();
-    }
-}
-
-setInterval(updateTimer,1000);
-
-/* RESULT */
-function generateResult(){
-    let num=Math.floor(Math.random()*10);
-    let li=document.createElement("li");
-    li.innerText="Result: "+num;
-    document.getElementById("historyList").prepend(li);
-}
-
-/* WALLET */
-function showWallet(){
-    alert("Wallet Balance: ₹" + walletAmount);
-}
-
-/* POPUP */
-function openPopup(color){
-    selectedColor=color;
-    document.getElementById("popup").style.display="flex";
-    document.getElementById("popupTitle").innerText="Selected: "+color.toUpperCase();
-}
-
-function confirmBet(){
-    let amount=parseInt(document.getElementById("amount").value);
-
-    if(amount>walletAmount){
-        alert("Insufficient Balance!");
-        return;
-    }
-
-    walletAmount-=amount;
-    alert("Bet Placed on "+selectedColor+" for ₹"+amount);
-    document.getElementById("popup").style.display="none";
-}
-
-/* CREATE NUMBERS */
-let numbersDiv=document.getElementById("numbers");
-
-for(let i=0;i<=9;i++){
-    let div=document.createElement("div");
-    div.classList.add("num");
-    div.innerText=i;
-
-    if(i==0||i==5){
-        div.classList.add("violet");
-        div.onclick=()=>openPopup("violet");
-    }
-    else if(i%2==0){
-        div.classList.add("red");
-        div.onclick=()=>openPopup("red");
-    }
-    else{
-        div.classList.add("green");
-        div.onclick=()=>openPopup("green");
-    }
-
-    numbersDiv.appendChild(div);
-}
-
-</script>
-
-</body>
-    </html>
