@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+
+ .<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HD Color Prediction Game</title>
-
 <style>
 body{
     margin:0;
@@ -14,34 +14,19 @@ body{
     text-align:center;
 }
 
-/* HEADER */
 header{
     padding:15px;
     font-size:22px;
     background:#ff9800;
     font-weight:bold;
-    position:relative;
 }
 
-.wallet-btn{
-    position:absolute;
-    right:15px;
-    top:10px;
-    background:#00c853;
-    padding:8px 15px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:14px;
-}
-
-/* TIMER */
 .timer{
     font-size:30px;
     margin:20px;
     color:#00ffcc;
 }
 
-/* NUMBERS */
 .numbers{
     display:grid;
     grid-template-columns:repeat(5,60px);
@@ -62,170 +47,86 @@ header{
     font-weight:bold;
 }
 
-.red{ background:#ff1744; }
-.green{ background:#00e676; }
+.green{background:#00c853;}
+.red{background:#d50000;}
+.violet{background:#aa00ff;}
 
-/* RESULT HISTORY */
+.buttons button{
+    padding:10px 20px;
+    margin:10px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.big{background:#ff9800;}
+.small{background:#2196f3;}
+
 .history{
     margin-top:20px;
 }
-
-.result-box{
-    display:inline-block;
-    padding:8px;
-    margin:5px;
-    border-radius:5px;
-    font-size:14px;
-}
-
-/* WALLET MODAL */
-.modal{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.7);
-}
-
-.modal-content{
-    background:#1f1f2e;
-    margin:100px auto;
-    padding:20px;
-    width:300px;
-    border-radius:10px;
-    text-align:center;
-    box-shadow:0 0 20px rgba(0,255,200,0.5);
-}
-
-input{
-    padding:8px;
-    width:80%;
-    margin:10px;
-    border-radius:5px;
-    border:none;
-}
-
-button{
-    padding:8px 15px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-}
 </style>
 </head>
-
 <body>
 
-<header>
-HD Color Prediction Game
-<div class="wallet-btn" onclick="openWallet()">Wallet ₹<span id="wallet">0</span></div>
-</header>
+<header>HD Color Prediction Game</header>
 
-<div class="timer" id="timer">60</div>
+<div class="timer">Time Left: <span id="time">30</span>s</div>
 
 <div class="numbers" id="numbers"></div>
 
-<h3>Last 10 Results</h3>
-<div class="history" id="history"></div>
-
-<!-- WALLET POPUP -->
-<div class="modal" id="walletModal">
-    <div class="modal-content">
-        <h3>My Wallet</h3>
-        <p>Current Balance: ₹<span id="walletDisplay">0</span></p>
-        <input type="number" id="addAmount" placeholder="Enter amount">
-        <br>
-        <button onclick="addMoney()">Add Money</button>
-        <button onclick="closeWallet()">Close</button>
-    </div>
+<div class="buttons">
+<button class="big" onclick="selectBig()">Big</button>
+<button class="small" onclick="selectSmall()">Small</button>
 </div>
 
-<!-- SOUND -->
-<audio id="beep" src="https://www.soundjay.com/button/beep-07.wav"></audio>
-<audio id="winSound" src="https://www.soundjay.com/button/button-3.wav"></audio>
+<div class="history">
+<h3>Game History</h3>
+<ul id="historyList"></ul>
+</div>
 
 <script>
-let wallet = localStorage.getItem("wallet") ? parseInt(localStorage.getItem("wallet")) : 0;
-let history = localStorage.getItem("history") ? JSON.parse(localStorage.getItem("history")) : [];
-let time = 60;
 
-document.getElementById("wallet").innerText = wallet;
-document.getElementById("walletDisplay").innerText = wallet;
-
-/* CREATE NUMBERS */
-let numbersDiv = document.getElementById("numbers");
-for(let i=1;i<=10;i++){
-    let div = document.createElement("div");
-    div.classList.add("num");
-    div.classList.add(i%2==0 ? "green":"red");
-    div.innerText = i;
-    numbersDiv.appendChild(div);
-}
-
-/* TIMER */
-setInterval(()=>{
+let time=30;
+let timer=setInterval(()=>{
     time--;
-    document.getElementById("timer").innerText = time;
-
-    if(time<=5 && time>0){
-        document.getElementById("beep").play();
-    }
-
-    if(time==0){
+    document.getElementById("time").innerText=time;
+    if(time<=0){
         generateResult();
-        time=60;
+        time=30;
     }
 },1000);
 
-/* GENERATE RESULT */
 function generateResult(){
-    let random = Math.floor(Math.random()*10)+1;
-    let color = random%2==0 ? "green":"red";
-
-    history.unshift({num:random,color:color});
-    if(history.length>10) history.pop();
-
-    localStorage.setItem("history",JSON.stringify(history));
-    showHistory();
-
-    document.getElementById("winSound").play();
+    let num=Math.floor(Math.random()*10);
+    let li=document.createElement("li");
+    li.innerText="Result: "+num;
+    document.getElementById("historyList").prepend(li);
 }
 
-/* SHOW HISTORY */
-function showHistory(){
-    let historyDiv = document.getElementById("history");
-    historyDiv.innerHTML="";
-    history.forEach(r=>{
-        let box=document.createElement("div");
-        box.classList.add("result-box");
-        box.style.background=r.color=="green"?"#00e676":"#ff1744";
-        box.innerText=r.num;
-        historyDiv.appendChild(box);
-    });
+function selectBig(){
+    alert("You selected BIG");
 }
-showHistory();
 
-/* WALLET FUNCTIONS */
-function openWallet(){
-    document.getElementById("walletModal").style.display="block";
+function selectSmall(){
+    alert("You selected SMALL");
 }
-function closeWallet(){
-    document.getElementById("walletModal").style.display="none";
+
+let numbersDiv=document.getElementById("numbers");
+for(let i=0;i<=9;i++){
+    let div=document.createElement("div");
+    div.classList.add("num");
+    div.innerText=i;
+
+    if(i==0||i==5) div.classList.add("violet");
+    else if(i%2==0) div.classList.add("red");
+    else div.classList.add("green");
+
+    numbersDiv.appendChild(div);
 }
-function addMoney(){
-    let amt = parseInt(document.getElementById("addAmount").value);
-    if(amt>0){
-        wallet+=amt;
-        localStorage.setItem("wallet",wallet);
-        document.getElementById("wallet").innerText=wallet;
-        document.getElementById("walletDisplay").innerText=wallet;
-        document.getElementById("addAmount").value="";
-        alert("Money Added Successfully!");
-    }
-}
+
 </script>
 
 </body>
-    </html>
+</html>
