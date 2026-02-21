@@ -58,3 +58,174 @@ header{
     align-items:center;
     justify-content:center;
     font-size:20px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.red{ background:#ff1744; }
+.green{ background:#00e676; }
+
+/* RESULT HISTORY */
+.history{
+    margin-top:20px;
+}
+
+.result-box{
+    display:inline-block;
+    padding:8px;
+    margin:5px;
+    border-radius:5px;
+    font-size:14px;
+}
+
+/* WALLET MODAL */
+.modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+}
+
+.modal-content{
+    background:#1f1f2e;
+    margin:100px auto;
+    padding:20px;
+    width:300px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 0 20px rgba(0,255,200,0.5);
+}
+
+input{
+    padding:8px;
+    width:80%;
+    margin:10px;
+    border-radius:5px;
+    border:none;
+}
+
+button{
+    padding:8px 15px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+HD Color Prediction Game
+<div class="wallet-btn" onclick="openWallet()">Wallet ₹<span id="wallet">0</span></div>
+</header>
+
+<div class="timer" id="timer">60</div>
+
+<div class="numbers" id="numbers"></div>
+
+<h3>Last 10 Results</h3>
+<div class="history" id="history"></div>
+
+<!-- WALLET POPUP -->
+<div class="modal" id="walletModal">
+    <div class="modal-content">
+        <h3>My Wallet</h3>
+        <p>Current Balance: ₹<span id="walletDisplay">0</span></p>
+        <input type="number" id="addAmount" placeholder="Enter amount">
+        <br>
+        <button onclick="addMoney()">Add Money</button>
+        <button onclick="closeWallet()">Close</button>
+    </div>
+</div>
+
+<!-- SOUND -->
+<audio id="beep" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+<audio id="winSound" src="https://www.soundjay.com/button/button-3.wav"></audio>
+
+<script>
+let wallet = localStorage.getItem("wallet") ? parseInt(localStorage.getItem("wallet")) : 0;
+let history = localStorage.getItem("history") ? JSON.parse(localStorage.getItem("history")) : [];
+let time = 60;
+
+document.getElementById("wallet").innerText = wallet;
+document.getElementById("walletDisplay").innerText = wallet;
+
+/* CREATE NUMBERS */
+let numbersDiv = document.getElementById("numbers");
+for(let i=1;i<=10;i++){
+    let div = document.createElement("div");
+    div.classList.add("num");
+    div.classList.add(i%2==0 ? "green":"red");
+    div.innerText = i;
+    numbersDiv.appendChild(div);
+}
+
+/* TIMER */
+setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText = time;
+
+    if(time<=5 && time>0){
+        document.getElementById("beep").play();
+    }
+
+    if(time==0){
+        generateResult();
+        time=60;
+    }
+},1000);
+
+/* GENERATE RESULT */
+function generateResult(){
+    let random = Math.floor(Math.random()*10)+1;
+    let color = random%2==0 ? "green":"red";
+
+    history.unshift({num:random,color:color});
+    if(history.length>10) history.pop();
+
+    localStorage.setItem("history",JSON.stringify(history));
+    showHistory();
+
+    document.getElementById("winSound").play();
+}
+
+/* SHOW HISTORY */
+function showHistory(){
+    let historyDiv = document.getElementById("history");
+    historyDiv.innerHTML="";
+    history.forEach(r=>{
+        let box=document.createElement("div");
+        box.classList.add("result-box");
+        box.style.background=r.color=="green"?"#00e676":"#ff1744";
+        box.innerText=r.num;
+        historyDiv.appendChild(box);
+    });
+}
+showHistory();
+
+/* WALLET FUNCTIONS */
+function openWallet(){
+    document.getElementById("walletModal").style.display="block";
+}
+function closeWallet(){
+    document.getElementById("walletModal").style.display="none";
+}
+function addMoney(){
+    let amt = parseInt(document.getElementById("addAmount").value);
+    if(amt>0){
+        wallet+=amt;
+        localStorage.setItem("wallet",wallet);
+        document.getElementById("wallet").innerText=wallet;
+        document.getElementById("walletDisplay").innerText=wallet;
+        document.getElementById("addAmount").value="";
+        alert("Money Added Successfully!");
+    }
+}
+</script>
+
+</body>
+    </html>
